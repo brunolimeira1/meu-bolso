@@ -385,8 +385,7 @@
     if (await chamarAssistente({ mensagem }, $("botao-enviar"))) $("frase").value = "";
   }
 
-  async function enviarFoto() {
-    const entrada = $("arquivo-foto");
+  async function enviarFoto(entrada, botao) {
     const arquivo = entrada.files && entrada.files[0];
     entrada.value = "";
     if (!arquivo) return;
@@ -396,7 +395,7 @@
     } catch {
       return respostaAssistente("Não consegui abrir essa foto. Tire outra, com o cupom inteiro e bem iluminado.", true);
     }
-    await chamarAssistente({ imagem, mime: "image/jpeg", mensagem: $("frase").value.trim() }, $("botao-foto"));
+    await chamarAssistente({ imagem, mime: "image/jpeg", mensagem: $("frase").value.trim() }, botao);
   }
 
   async function abrirPrincipal() {
@@ -423,8 +422,11 @@
     $("botao-sair").addEventListener("click", sair);
     $("form-gasto").addEventListener("submit", salvarGasto);
     $("form-assistente").addEventListener("submit", enviarFrase);
-    $("botao-foto").addEventListener("click", () => $("arquivo-foto").click());
-    $("arquivo-foto").addEventListener("change", enviarFoto);
+    // Abrir câmera tira a foto na hora; Anexar foto escolhe uma da galeria.
+    $("botao-camera").addEventListener("click", () => $("arquivo-camera").click());
+    $("botao-anexar").addEventListener("click", () => $("arquivo-anexo").click());
+    $("arquivo-camera").addEventListener("change", () => enviarFoto($("arquivo-camera"), $("botao-camera")));
+    $("arquivo-anexo").addEventListener("change", () => enviarFoto($("arquivo-anexo"), $("botao-anexar")));
 
     const minimoAbertura = new Promise((r) => setTimeout(r, 700));
     const { data } = await supabase.auth.getSession();

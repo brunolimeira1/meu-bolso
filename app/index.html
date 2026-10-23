@@ -79,8 +79,12 @@
         <input id="frase" type="text" placeholder="Ex.: mercado 50 hoje" autocomplete="off" maxlength="500">
         <button type="submit" id="botao-enviar" class="botao principal">Enviar</button>
       </form>
-      <button type="button" id="botao-foto" class="botao secundario">Foto do cupom</button>
-      <input id="arquivo-foto" type="file" accept="image/*" capture="environment" hidden>
+      <div class="linha-fotos">
+        <button type="button" id="botao-camera" class="botao secundario">Abrir câmera</button>
+        <button type="button" id="botao-anexar" class="botao secundario">Anexar foto</button>
+      </div>
+      <input id="arquivo-camera" type="file" accept="image/*" capture="environment" hidden>
+      <input id="arquivo-anexo" type="file" accept="image/*" hidden>
       <p id="aviso-assistente" class="aviso informativo" role="status" hidden></p>
     </section>
 

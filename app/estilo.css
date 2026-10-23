@@ -269,6 +269,11 @@ input:focus {
 }
 .linha-assistente input { flex: 1; min-width: 0; }
 .linha-assistente .botao { width: auto; margin-top: 0; padding: 0 18px; }
+.linha-fotos {
+  display: flex;
+  gap: 8px;
+}
+.linha-fotos .botao { flex: 1; padding: 0 8px; }
 
 /* Lista do mês */
 .lista-gastos {
