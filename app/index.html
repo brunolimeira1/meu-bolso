@@ -73,13 +73,14 @@
 
     <section class="cartao assistente" aria-labelledby="titulo-assistente">
       <h2 id="titulo-assistente">Assistente</h2>
-      <p class="dica">Escreva ou dite uma frase, como "almoço 32 reais".</p>
+      <p class="dica">Escreva ou dite um gasto ("mercado 50 hoje"), faça uma pergunta ("quanto gastei com mercado este mês?") ou mande a foto do cupom.</p>
       <form id="form-assistente" class="linha-assistente" novalidate>
         <label for="frase" class="so-leitor">Frase do gasto</label>
-        <input id="frase" type="text" placeholder="Ex.: mercado 150 reais" autocomplete="off">
-        <button type="submit" class="botao principal">Enviar</button>
+        <input id="frase" type="text" placeholder="Ex.: mercado 50 hoje" autocomplete="off" maxlength="500">
+        <button type="submit" id="botao-enviar" class="botao principal">Enviar</button>
       </form>
       <button type="button" id="botao-foto" class="botao secundario">Foto do cupom</button>
+      <input id="arquivo-foto" type="file" accept="image/*" capture="environment" hidden>
       <p id="aviso-assistente" class="aviso informativo" role="status" hidden></p>
     </section>
 

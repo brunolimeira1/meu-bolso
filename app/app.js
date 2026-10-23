@@ -313,8 +313,90 @@
     await carregarGastos();
   }
 
-  function avisoAssistente() {
-    mostrarAviso("aviso-assistente", "O assistente chega na sexta.");
+  // ---------- Assistente ----------
+
+  function respostaAssistente(texto, erro) {
+    $("aviso-assistente").classList.toggle("informativo", !erro);
+    mostrarAviso("aviso-assistente", texto);
+  }
+
+  // Reduz a foto para no máximo 1600 px e converte em JPEG, no próprio aparelho.
+  // A foto não é guardada: só a versão reduzida sai, uma vez, para o assistente.
+  function reduzirFoto(arquivo) {
+    return new Promise((resolver, rejeitar) => {
+      const endereco = URL.createObjectURL(arquivo);
+      const img = new Image();
+      img.onload = () => {
+        const escala = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+        const tela = document.createElement("canvas");
+        tela.width = Math.round(img.naturalWidth * escala);
+        tela.height = Math.round(img.naturalHeight * escala);
+        tela.getContext("2d").drawImage(img, 0, 0, tela.width, tela.height);
+        URL.revokeObjectURL(endereco);
+        resolver(tela.toDataURL("image/jpeg", 0.85).split(",")[1]);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(endereco);
+        rejeitar(new Error("foto"));
+      };
+      img.src = endereco;
+    });
+  }
+
+  async function chamarAssistente(pedido, botao) {
+    respostaAssistente("Pensando…", false);
+    ocupado(botao, true);
+    try {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session && data.session.access_token;
+      if (!token) throw new Error("Sua sessão expirou. Toque em Sair e entre de novo.");
+
+      let resposta;
+      try {
+        resposta = await fetch("/api/assistente", {
+          method: "POST",
+          headers: { "content-type": "application/json", Authorization: "Bearer " + token },
+          body: JSON.stringify({ ...pedido, categorias: CATEGORIAS })
+        });
+      } catch {
+        throw new Error("Sem conexão com a internet. Confira sua rede e tente de novo.");
+      }
+
+      let corpo = null;
+      try { corpo = await resposta.json(); } catch {}
+      if (!corpo) throw new Error("O assistente não está disponível neste endereço. Use o app publicado na Netlify.");
+      if (!resposta.ok || corpo.erro) throw new Error(corpo.erro || "O assistente não respondeu. Tente de novo.");
+
+      respostaAssistente(corpo.resposta, false);
+      if (corpo.lancou) await carregarGastos();
+      return true;
+    } catch (e) {
+      respostaAssistente(e.message, true);
+      return false;
+    } finally {
+      ocupado(botao, false);
+    }
+  }
+
+  async function enviarFrase(evento) {
+    evento.preventDefault();
+    const mensagem = $("frase").value.trim();
+    if (!mensagem) return respostaAssistente("Escreva um gasto ou uma pergunta.", true);
+    if (await chamarAssistente({ mensagem }, $("botao-enviar"))) $("frase").value = "";
+  }
+
+  async function enviarFoto() {
+    const entrada = $("arquivo-foto");
+    const arquivo = entrada.files && entrada.files[0];
+    entrada.value = "";
+    if (!arquivo) return;
+    let imagem;
+    try {
+      imagem = await reduzirFoto(arquivo);
+    } catch {
+      return respostaAssistente("Não consegui abrir essa foto. Tire outra, com o cupom inteiro e bem iluminado.", true);
+    }
+    await chamarAssistente({ imagem, mime: "image/jpeg", mensagem: $("frase").value.trim() }, $("botao-foto"));
   }
 
   async function abrirPrincipal() {
@@ -340,8 +422,9 @@
     $("botao-criar").addEventListener("click", criarConta);
     $("botao-sair").addEventListener("click", sair);
     $("form-gasto").addEventListener("submit", salvarGasto);
-    $("form-assistente").addEventListener("submit", (e) => { e.preventDefault(); avisoAssistente(); });
-    $("botao-foto").addEventListener("click", avisoAssistente);
+    $("form-assistente").addEventListener("submit", enviarFrase);
+    $("botao-foto").addEventListener("click", () => $("arquivo-foto").click());
+    $("arquivo-foto").addEventListener("change", enviarFoto);
 
     const minimoAbertura = new Promise((r) => setTimeout(r, 700));
     const { data } = await supabase.auth.getSession();
