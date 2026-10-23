@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "app-local",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\Users\\BRUNO~1.MOU\\AppData\\Local\\Temp\\claude\\C--Users-bruno-moutinho-OneDrive---TECNOGERA-LOCACAO-E-TRANSF-ENERGIA-SA--rea-de-Trabalho-meu-bolso\\bf87e1ad-d90e-4512-99ce-4fe17e936618\\scratchpad\\servidor.ps1", "-Raiz", "C:\\Users\\bruno.moutinho\\OneDrive - TECNOGERA LOCACAO E TRANSF ENERGIA SA\\Área de Trabalho\\meu-bolso\\app"],
+      "port": 8090
+    }
+  ]
+}

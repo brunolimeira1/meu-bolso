@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e5fbf">
+  <title>Minhas Despesas</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icone.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icone.svg">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+  <!-- Abertura: logo sobre fundo branco -->
+  <div id="abertura" class="abertura">
+    <img src="icone.svg" alt="" width="96" height="96">
+    <p>Minhas Despesas</p>
+  </div>
+
+  <!-- Tela de entrada -->
+  <main id="tela-entrada" class="tela-entrada" hidden>
+    <img src="icone.svg" alt="" width="72" height="72">
+    <h1>Minhas Despesas</h1>
+    <form id="form-entrada" class="cartao" novalidate>
+      <label for="email">E-mail</label>
+      <input id="email" type="email" autocomplete="email" inputmode="email" required>
+      <label for="senha">Senha</label>
+      <input id="senha" type="password" autocomplete="current-password" minlength="6" required>
+      <p id="aviso-entrada" class="aviso" role="alert" hidden></p>
+      <button type="submit" id="botao-entrar" class="botao principal">Entrar</button>
+      <button type="button" id="botao-criar" class="botao secundario">Criar conta</button>
+    </form>
+  </main>
+
+  <!-- Tela principal -->
+  <main id="tela-principal" class="tela-principal" hidden>
+    <header class="topo">
+      <h1>Minhas Despesas</h1>
+      <button type="button" id="botao-sair" class="botao-texto">Sair</button>
+    </header>
+
+    <p id="aviso-geral" class="aviso" role="alert" hidden></p>
+
+    <section class="cartao destaque" aria-labelledby="titulo-total">
+      <h2 id="titulo-total" class="rotulo">Gasto em <span id="nome-mes"></span></h2>
+      <p id="total-mes" class="total">R$ 0,00</p>
+      <ul id="barras" class="barras"></ul>
+    </section>
+
+    <section id="cartao-resumo" class="cartao" hidden aria-labelledby="titulo-resumo">
+      <h2 id="titulo-resumo">Resumo da semana</h2>
+      <p id="texto-resumo" class="texto-resumo"></p>
+    </section>
+
+    <section class="cartao" aria-labelledby="titulo-lancar">
+      <h2 id="titulo-lancar">Lançar à mão</h2>
+      <form id="form-gasto" novalidate>
+        <fieldset class="categorias">
+          <legend>Categoria</legend>
+          <div id="opcoes-categoria" class="opcoes-categoria"></div>
+        </fieldset>
+        <label for="valor">Valor (R$)</label>
+        <input id="valor" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off" required>
+        <label for="descricao">Onde ou com o quê</label>
+        <input id="descricao" type="text" placeholder="Ex.: padaria, gasolina" maxlength="80" autocomplete="off">
+        <label for="data">Data</label>
+        <input id="data" type="date" required>
+        <p id="aviso-gasto" class="aviso" role="alert" hidden></p>
+        <button type="submit" id="botao-salvar" class="botao principal">Salvar</button>
+      </form>
+    </section>
+
+    <section class="cartao assistente" aria-labelledby="titulo-assistente">
+      <h2 id="titulo-assistente">Assistente</h2>
+      <p class="dica">Escreva ou dite uma frase, como "almoço 32 reais".</p>
+      <form id="form-assistente" class="linha-assistente" novalidate>
+        <label for="frase" class="so-leitor">Frase do gasto</label>
+        <input id="frase" type="text" placeholder="Ex.: mercado 150 reais" autocomplete="off">
+        <button type="submit" class="botao principal">Enviar</button>
+      </form>
+      <button type="button" id="botao-foto" class="botao secundario">Foto do cupom</button>
+      <p id="aviso-assistente" class="aviso informativo" role="status" hidden></p>
+    </section>
+
+    <section class="cartao" aria-labelledby="titulo-lista">
+      <h2 id="titulo-lista">Gastos do mês</h2>
+      <p id="lista-vazia" class="dica">Nenhum gasto lançado neste mês.</p>
+      <ul id="lista-gastos" class="lista-gastos"></ul>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="configuracao.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
