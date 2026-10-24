@@ -395,6 +395,85 @@
     if (await chamarAssistente({ mensagem }, $("botao-enviar"))) $("frase").value = "";
   }
 
+  // ---------- Microfone ----------
+
+  function fraseErroVoz(codigo) {
+    if (codigo === "not-allowed" || codigo === "service-not-allowed") {
+      return "Permita o uso do microfone para este site nas configurações do navegador e tente de novo.";
+    }
+    if (codigo === "audio-capture") return "Não encontrei o microfone. Use o microfone do teclado do celular.";
+    if (codigo === "network") return "Sem conexão para reconhecer a voz. Confira sua internet ou use o microfone do teclado.";
+    if (!codigo || codigo === "no-speech") return "Não ouvi nada. Toque no microfone e fale de novo.";
+    return "Não consegui ouvir. Tente de novo ou use o microfone do teclado do celular.";
+  }
+
+  // Escuta em português, escreve no campo e envia ao assistente.
+  // Sem reconhecimento de voz no navegador, o botão some e aparece a dica do teclado.
+  function prepararMicrofone() {
+    const Reconhecimento = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const botao = $("botao-microfone");
+    if (!Reconhecimento) {
+      botao.hidden = true;
+      $("dica-microfone").hidden = false;
+      return;
+    }
+
+    let escuta = null;
+
+    function pararVisual() {
+      botao.classList.remove("escutando");
+      botao.setAttribute("aria-pressed", "false");
+      botao.setAttribute("aria-label", "Falar o gasto");
+    }
+
+    botao.addEventListener("click", () => {
+      if (escuta) {
+        escuta.stop();
+        return;
+      }
+      const r = new Reconhecimento();
+      r.lang = "pt-BR";
+      r.interimResults = false;
+      r.maxAlternatives = 1;
+      let ouviu = "";
+      let erro = "";
+
+      r.onstart = () => {
+        botao.classList.add("escutando");
+        botao.setAttribute("aria-pressed", "true");
+        botao.setAttribute("aria-label", "Parar de escutar");
+        respostaAssistente("Escutando… fale o gasto ou a pergunta.", false);
+      };
+      r.onresult = (e) => {
+        ouviu = String(e.results[0][0].transcript || "").trim();
+      };
+      r.onerror = (e) => {
+        erro = e.error;
+      };
+      r.onend = async () => {
+        escuta = null;
+        pararVisual();
+        if (ouviu) {
+          $("frase").value = ouviu;
+          if (await chamarAssistente({ mensagem: ouviu }, $("botao-enviar"))) $("frase").value = "";
+        } else if (erro === "aborted") {
+          mostrarAviso("aviso-assistente", "");
+        } else {
+          respostaAssistente(fraseErroVoz(erro), true);
+        }
+      };
+
+      escuta = r;
+      try {
+        r.start();
+      } catch {
+        escuta = null;
+        pararVisual();
+        respostaAssistente(fraseErroVoz(""), true);
+      }
+    });
+  }
+
   async function enviarFoto(entrada, botao) {
     const arquivo = entrada.files && entrada.files[0];
     entrada.value = "";
@@ -446,6 +525,7 @@
     $("botao-anexar").addEventListener("click", () => $("arquivo-anexo").click());
     $("arquivo-camera").addEventListener("change", () => enviarFoto($("arquivo-camera"), $("botao-camera")));
     $("arquivo-anexo").addEventListener("change", () => enviarFoto($("arquivo-anexo"), $("botao-anexar")));
+    prepararMicrofone();
 
     const minimoAbertura = new Promise((r) => setTimeout(r, 700));
     const { data } = await supabase.auth.getSession();

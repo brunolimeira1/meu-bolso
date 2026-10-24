@@ -77,8 +77,10 @@
       <form id="form-assistente" class="linha-assistente" novalidate>
         <label for="frase" class="so-leitor">Frase do gasto</label>
         <input id="frase" type="text" placeholder="Ex.: mercado 50 hoje" autocomplete="off" maxlength="500">
+        <button type="button" id="botao-microfone" class="botao-microfone" aria-label="Falar o gasto" aria-pressed="false">🎤</button>
         <button type="submit" id="botao-enviar" class="botao principal">Enviar</button>
       </form>
+      <p id="dica-microfone" class="dica dica-microfone" hidden>Use o microfone do teclado do celular.</p>
       <div class="linha-fotos">
         <button type="button" id="botao-camera" class="botao secundario">Abrir câmera</button>
         <button type="button" id="botao-anexar" class="botao secundario">Anexar foto</button>
