@@ -4,8 +4,9 @@
 (function () {
   "use strict";
 
-  const config = window.MEU_BOLSO;
-  const CATEGORIAS = config.CATEGORIAS;
+  // Se configuracao.js não carregar, o app não para aqui: iniciar() avisa a pessoa.
+  const config = window.MEU_BOLSO || {};
+  const CATEGORIAS = config.CATEGORIAS || [];
   const $ = (id) => document.getElementById(id);
 
   const formatoReal = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
@@ -406,11 +407,20 @@
 
   // ---------- Início ----------
 
+  // Qualquer falha ao abrir tira a logo da frente e mostra uma frase, nunca a tela em branco.
+  function falhaNaAbertura() {
+    esconderAbertura();
+    if (!$("tela-principal").hidden) {
+      mostrarAviso("aviso-geral", "Não consegui carregar seus gastos. Confira sua internet e recarregue a página.");
+      return;
+    }
+    mostrarTela("entrada");
+    mostrarAviso("aviso-entrada", "Não consegui abrir o app. Confira sua internet e recarregue a página.");
+  }
+
   async function iniciar() {
-    if (!window.supabase || !window.supabase.createClient) {
-      esconderAbertura();
-      mostrarTela("entrada");
-      mostrarAviso("aviso-entrada", "Não consegui carregar o app. Confira sua internet e recarregue a página.");
+    if (!window.supabase || !window.supabase.createClient || !config.SUPABASE_URL || !CATEGORIAS.length) {
+      falhaNaAbertura();
       return;
     }
 
@@ -454,5 +464,5 @@
     });
   }
 
-  iniciar();
+  iniciar().catch(falhaNaAbertura);
 })();

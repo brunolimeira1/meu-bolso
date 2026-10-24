@@ -296,7 +296,7 @@ input:focus {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.gasto-detalhe { font-size: 0.85rem; color: var(--texto-suave); }
+.gasto-detalhe { font-size: 0.875rem; color: var(--texto-suave); }
 .gasto-valor { font-weight: 700; color: var(--azul-escuro); white-space: nowrap; }
 .botao-apagar {
   background: none;
@@ -304,8 +304,10 @@ input:focus {
   border-radius: 10px;
   color: var(--texto-suave);
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   padding: 8px 10px;
-  min-height: 40px;
+  min-height: 44px;
+  min-width: 44px;
+  margin-left: 4px; /* afasta do valor para não errar o toque */
   cursor: pointer;
 }
