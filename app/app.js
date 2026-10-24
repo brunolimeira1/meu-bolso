@@ -344,6 +344,15 @@
     });
   }
 
+  // Só mostra a mensagem se ela parecer uma frase nossa, em português.
+  // Texto técnico (em inglês, por exemplo) vira a frase padrão.
+  const FRASE_PADRAO_ASSISTENTE = "O assistente não respondeu. Tente de novo em instantes.";
+  function fraseDoAssistente(texto) {
+    if (typeof texto !== "string" || !texto.trim()) return FRASE_PADRAO_ASSISTENTE;
+    const pareceNossa = /[ãõçáéíóúâêô]/i.test(texto) || /\b(tente|confira|toque|use|escreva|entre)\b/i.test(texto);
+    return pareceNossa ? texto : FRASE_PADRAO_ASSISTENTE;
+  }
+
   async function chamarAssistente(pedido, botao) {
     respostaAssistente("Pensando…", false);
     ocupado(botao, true);
@@ -366,13 +375,13 @@
       let corpo = null;
       try { corpo = await resposta.json(); } catch {}
       if (!corpo) throw new Error("O assistente não está disponível neste endereço. Use o app publicado na Netlify.");
-      if (!resposta.ok || corpo.erro) throw new Error(corpo.erro || "O assistente não respondeu. Tente de novo.");
+      if (!resposta.ok || corpo.erro) throw new Error(corpo.erro);
 
       respostaAssistente(corpo.resposta, false);
       if (corpo.lancou) await carregarGastos();
       return true;
     } catch (e) {
-      respostaAssistente(e.message, true);
+      respostaAssistente(fraseDoAssistente(e && e.message), true);
       return false;
     } finally {
       ocupado(botao, false);
